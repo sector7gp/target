@@ -158,13 +158,13 @@ void loop() {
             animationReset(); // Esto ya pone isHit = false
             sendResetToAPI();
             isMatch = true;
-        } else {
+        } else if (!isHit) {
             for(int i=0; i<6; i++) {
                 if(code == players[i].code) {
                     global_last_ir = players[i].name;
                     animationHit(players[i].color);
                     isHit = true;
-                    hitTime = millis();
+                    // El target queda bloqueado (isHit) infinitamente hasta el reset.
                     sendHitToAPI(i + 1);
                     isMatch = true;
                     break;
@@ -173,9 +173,6 @@ void loop() {
         }
         IrReceiver.resume();
     }
-
-    // Volver a Glow Verde
-    if (isHit && (millis() - hitTime > 2000)) isHit = false;
 
     if (!isHit) {
         uint8_t br = beatsin8(15, 30, 150);
