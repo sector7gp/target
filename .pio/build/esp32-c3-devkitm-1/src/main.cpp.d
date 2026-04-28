@@ -405,6 +405,7 @@
  .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Pronto.hpp \
  .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_DistanceWidthProtocol.hpp \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src/Preferences.h \
+ .pio/libdeps/esp32-c3-devkitm-1/PubSubClient/src/PubSubClient.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/WebServer.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/HTTP_Method.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/nghttp/port/include/http_parser.h \

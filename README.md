@@ -1,63 +1,58 @@
-# 🎯 BuzzLY Target - Firmware Estable para ESP32-C3
+# 🎯 BuzzLY Target Pro - Firmware Inteligente para ESP32-C3
 
-Este proyecto convierte un ESP32-C3 SuperMini en un blanco de tiro infrarrojo inteligente con monitoreo web, actualizaciones inalámbricas (OTA) y feedback visual mediante una tira de LEDs WS2812B.
+Este proyecto convierte un ESP32-C3 SuperMini en un blanco de tiro infrarrojo inteligente con monitoreo web, comunicación MQTT en tiempo real, actualizaciones inalámbricas (OTA) y una interfaz de usuario premium con estética "Buzz Neon Green".
 
 ## 🛠️ Hardware y Conexiones
 
 | Componente | Pin del ESP32-C3 | Descripción |
 | :--- | :--- | :--- |
-| **LED Strip (WS2812B)** | **GPIO 3** | Entrada de datos (DIN). Capacidad: 10 LEDs. |
+| **LED Strip (WS2812B)** | **GPIO 3** | Entrada de datos (DIN). Configurable desde la web. |
 | **Sensor IR Receiver** | **GPIO 4** | Pin de datos del receptor (tipo TSOP/VS1838). |
 | **Alimentación** | **5V / GND** | Se recomienda alimentar por el pin 5V (USB o externa). |
 
 > [!IMPORTANT]
 > **Modo de Flash**: El ESP32-C3 SuperMini debe flashearse en modo **DIO**. Esto ya está configurado en el archivo `platformio.ini`.
 
-## 📡 Conectividad y Red
+## 📡 Conectividad y Comunicación (Dual Mode)
 
-- **Portal de Configuración**: Si no hay WiFi, se crea la red `BuzzLY-Setup`.
-- **mDNS Name**: Acceso por defecto en `http://target1.local` (configurable desde la web).
-- **OTA Updates**: Actualización inalámbrica habilitada (Pass: `Buzz987`).
-- **API Endpoint**: Envía un JSON tipo `{"player_id": 1, "action": "hit"}` a la URL que configures.
+El sistema reporta cada impacto mediante dos protocolos simultáneos:
+
+- **🚀 MQTT (Recomendado)**: Envía mensajes JSON instantáneos a un Broker configurable.
+  - **Hit Topic**: `target/hit` -> `{"target":"target1", "player_id":1, "action":"hit"}`
+  - **Reset Topic**: `target/reset` -> El blanco escucha este topic para reiniciarse remotamente.
+- **🔗 HTTP API**: Realiza un POST JSON a la URL que configures en los ajustes.
+- **Arranque Paralelo**: El sistema inicia el sensor IR y las animaciones de inmediato al encenderse, sin esperar a que el WiFi se conecte.
 
 ## 🎮 Comandos IR (NEC Protocol)
 
-El sistema utiliza un filtrado estricto. Solo estos comandos activan el sistema:
-
 | Botón (Control 24b) | Código RAW | Acción |
 | :--- | :--- | :--- |
-| **Rojo** | `0xE51AFF00` | Impacto Jugador 1 |
-| **Verde** | `0x659AFF00` | Impacto Jugador 2 |
-| **Azul** | `0x5DA2FF00` | Impacto Jugador 3 |
-| **Amarillo** | `0x1DE2FF00` | Impacto Jugador 4 |
-| **Magenta** | `0xB748FF00` | Impacto Jugador 5 |
-| **Cyan** | `0x758AFF00` | Impacto Jugador 6 |
-| **Verde Oscuro (Reset)** | `0xBF40FF00` | Reset visual a "Glow Verde" |
+| **Rojo** | `0xE51AFF00` | Jugador 1 |
+| **Verde** | `0x659AFF00` | Jugador 2 |
+| **Azul** | `0x5DA2FF00` | Jugador 3 |
+| **Amarillo** | `0x1DE2FF00` | Jugador 4 |
+| **Magenta** | `0xB748FF00` | Jugador 5 |
+| **Cyan** | `0x758AFF00` | Jugador 6 |
+| **Off / Reset** | `0xBF40FF00` | Reset visual a "Glow Verde" |
 
-## 💻 Interfaz Web
+## ✨ Interfaz Web "Buzz Neon Green"
 
-- **Home (`/`)**: Muestra el último jugador que impactó y la potencia del WiFi. Incluye un botón para resetear el estado a Verde Glowing manualmente.
-- **Settings (`/settings`)**: Permite cambiar la URL de la API y el nombre de red (mDNS) sin tocar el código. Al guardar, la placa se reinicia automáticamente.
+Acceso vía mDNS en `http://target1.local` (o el nombre configurado).
 
-## 🚀 Instalación (PlatformIO)
+- **Monitor (`/`)**: Diseño Premium con Glassmorphism y estatus en tiempo real de MQTT y último impacto.
+- **Ajustes (`/settings`)**: Configuración dinámica sin flashear:
+  - Nombre mDNS y cantidad de LEDs (1-30).
+  - Broker MQTT y tópicos personalizados.
+  - Endpoint de API Legacy.
 
-1. Abrir la carpeta en VS Code con PlatformIO.
-2. Editar `src/config.h` si necesitás cambiar los códigos IR por defecto.
-3. Conectar el ESP32-C3 por USB.
-4. Ejecutar el comando de subida: `pio run -t upload`.
-5. Una vez configurado el WiFi, las siguientes subidas se pueden hacer por OTA automáticamente.
+## 🚀 Instalación y Mantenimiento
 
-## ✨ Efectos Visuales y Lógica de Partidas
+1. Abrir con PlatformIO en VS Code.
+2. Flashear la primera vez vía USB: `pio run -t upload`.
+3. Mantenimiento remoto vía **OTA** activo (Password: `Buzz987`).
 
-- **Glow Verde**: Estado de espera inactivo. El blanco está listo para recibir impactos.
-- **Sparkle y Bloqueo**: Al recibir un impacto, se genera una animación chispeante rápida en blanco/amarillo y el dispositivo se clava en el color del jugador. Ignorará todos los demás disparos hasta que reciba el código de Reset.
-
-## 🔫 Emisor de Prueba (TestTrigger)
-
-Dentro de la carpeta `aux/` se incluye un `testTrigger.ino` diseñado para correr en una segunda placa Arduino/ESP auxiliar.
-Permite enviar disparos repetitivos emulados mediante 7 botones físicos independientes hacia el pin IR (GPIO 2):
-- **Botones al 1 al 6** (GPIO 0, 1, 3, 4, 5, 6): Simulan los disparos de cada jugador.
-- **Botón 7** (GPIO 7): Emite la señal de Reset / Apagado.
+## 🔫 Herramientas Extra
+- **`aux/testTrigger.ino`**: Firmware para crear un emisor de prueba con 7 botones (6 jugadores + 1 reset).
 
 ---
-*Desarrollado para BuzzLY Target System.*
+*Mando del Comando Estelar - BuzzLY Target System.*

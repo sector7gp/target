@@ -1,4 +1,5 @@
+knolleary/PubSubClient @ ^2.8
+fastled/FastLED @ ^3.6.0
 bblanchon/ArduinoJson @ ^7.0.0
 z3t0/IRremote @ ^4.4.1
-fastled/FastLED @ ^3.6.0
 tzapu/WiFiManager @ ^2.0.17
