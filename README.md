@@ -47,5 +47,17 @@ El sistema utiliza un filtrado estricto. Solo estos comandos activan el sistema:
 4. Ejecutar el comando de subida: `pio run -t upload`.
 5. Una vez configurado el WiFi, las siguientes subidas se pueden hacer por OTA automáticamente.
 
+## ✨ Efectos Visuales y Lógica de Partidas
+
+- **Glow Verde**: Estado de espera inactivo. El blanco está listo para recibir impactos.
+- **Sparkle y Bloqueo**: Al recibir un impacto, se genera una animación chispeante rápida en blanco/amarillo y el dispositivo se clava en el color del jugador. Ignorará todos los demás disparos hasta que reciba el código de Reset.
+
+## 🔫 Emisor de Prueba (TestTrigger)
+
+Dentro de la carpeta `aux/` se incluye un `testTrigger.ino` diseñado para correr en una segunda placa Arduino/ESP auxiliar.
+Permite enviar disparos repetitivos emulados mediante 7 botones físicos independientes hacia el pin IR (GPIO 2):
+- **Botones al 1 al 6** (GPIO 0, 1, 3, 4, 5, 6): Simulan los disparos de cada jugador.
+- **Botón 7** (GPIO 7): Emite la señal de Reset / Apagado.
+
 ---
 *Desarrollado para BuzzLY Target System.*

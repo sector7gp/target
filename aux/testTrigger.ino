@@ -3,63 +3,74 @@
 
 // --- Configuración de Pines ---
 #define IR_SEND_PIN 2
-#define BUTTON_PIN  1
 
-// --- Códigos de Prueba (Mismos que BuzzLY Target) ---
-#define CODE_PLAYER1 0xE51AFF00 // Botón Rojo
-#define CODE_PLAYER2 0x659AFF00 // Botón Verde
-#define CODE_PLAYER3 0x5DA2FF00 // Botón Azul
-#define CODE_PLAYER4 0x1DE2FF00 // Botón Amarillo
-#define CODE_PLAYER5 0xB748FF00 // Botón Magenta
-#define CODE_PLAYER6 0x758AFF00 // Botón Cyan
-#define CODE_RESET   0xBF40FF00 // Botón Off / Reset
+// Definición de los 7 botones físicos
+const uint8_t buttonPins[7] = {0, 1, 3, 4, 5, 6, 7};
 
-// 🎯 ELIGE AQUÍ QUÉ CÓDIGO QUERÉS PROBAR:
-uint32_t active_code = CODE_PLAYER1; 
+// --- Códigos de Jugadores (Mismos que BuzzLY Target) ---
+const uint32_t playerCodes[7] = {
+    0xE51AFF00, // Jugador 1 (Rojo)
+    0x659AFF00, // Jugador 2 (Verde)
+    0x5DA2FF00, // Jugador 3 (Azul)
+    0x1DE2FF00, // Jugador 4 (Amarillo)
+    0xB748FF00, // Jugador 5 (Magenta)
+    0x758AFF00, // Jugador 6 (Cyan)
+    0xBF40FF00  // Reset
+};
+
+const char *playerNames[7] = {"Jugador 1 (ROJO)",    "Jugador 2 (VERDE)",
+                              "Jugador 3 (AZUL)",    "Jugador 4 (AMARILLO)",
+                              "Jugador 5 (MAGENTA)", "Jugador 6 (CYAN)",
+                              "Reset / Off"};
 
 void setup() {
   Serial.begin(115200);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  
-  // Iniciar módulo emisor IR en el pin configurado
+
+  // Configurar todos los pines de botón como entrada con pullup
+  for (int i = 0; i < 7; i++) {
+    pinMode(buttonPins[i], INPUT_PULLUP);
+  }
+
+  // Iniciar módulo emisor IR
   IrSender.begin(IR_SEND_PIN);
 
   Serial.println("\n==================================");
-  Serial.println(" 🔫 BuzzLY Test Trigger Listo");
-  Serial.printf("    Pin botón : GPIO%d\n", BUTTON_PIN);
-  Serial.printf("    Pin IR    : GPIO%d\n", IR_SEND_PIN);
-  Serial.printf("    Dato cfg  : 0x%08X\n", active_code);
+  Serial.println(" 🔫 BuzzLY Multi-Player Gun Ready");
+  Serial.printf("    Pin IR LED : GPIO%d\n", IR_SEND_PIN);
+  Serial.println("    7 Botones activos (GPIO 0,1,3,4,5,6,7)");
   Serial.println("==================================");
-  Serial.println("Esperando disparo...");
 }
 
 void loop() {
-  // Lógica de disparo con filtro anti-rebote (debounce)
-  if (digitalRead(BUTTON_PIN) == LOW) {
-    delay(20); // Esperar 20ms para estabilizar el botón
-    
-    // Si sigue apretado, es un disparo real
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      
-      Serial.println("\n>>> 💥 DISPARO INICIADO");
-      Serial.printf("    Enviando : 0x%08X (NEC 32 bits raw)\n", active_code);
+  // Escanear los 7 botones
+  for (int i = 0; i < 7; i++) {
+    if (digitalRead(buttonPins[i]) == LOW) {
+      delay(20); // Debounce
 
-      // 1. Enviamos el código base crudo (0 repeticiones iniciales)
-      IrSender.sendNECRaw(active_code, 0);
-      
-      int repeticiones = 0;
-      
-      // 2. Mientras mantengas el botón apretado, mandamos la señal de "repetición".
-      // Esto simula cómo los controles remotos reales manejan botones mantenidos.
-      while (digitalRead(BUTTON_PIN) == LOW) {
-        delay(110); // Espacio estándar NEC de 110ms entre repeticiones
-        IrSender.sendNECRepeat();
-        repeticiones++;
+      if (digitalRead(buttonPins[i]) == LOW) {
+        Serial.printf("\n>>> 💥 DISPARO: %s\n", playerNames[i]);
+        Serial.printf("    Enviando: 0x%08X\n", playerCodes[i]);
+
+        // Enviar código base
+        IrSender.sendNECRaw(playerCodes[i], 0);
+
+        int repeticiones = 0;
+
+        // Mientras mantengas el botón apretado, enviar repeticiones
+        while (digitalRead(buttonPins[i]) == LOW) {
+          delay(110);
+          IrSender.sendNECRepeat();
+          repeticiones++;
+
+          // Limitar repeticiones para que no se trabe si el botón falla
+          if (repeticiones > 50)
+            break;
+        }
+
+        Serial.printf("    Disparo finalizado (%d rpt)\n", repeticiones);
+        delay(200); // Pequeña pausa entre disparos
       }
-
-      Serial.printf("    Repeticiones: %d\n", repeticiones);
-      Serial.println(">>> ⏹️ DISPARO FINALIZADO");
-      Serial.println("Esperando...");
     }
   }
+  delay(10);
 }
