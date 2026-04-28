@@ -7,10 +7,14 @@
 // --- Configuración de Red ---
 #define API_ENDPOINT "http://tuservidor.com/api/hit"
 #define MDNS_HOSTNAME "buzzly-target"
+#define MQTT_BROKER "broker.hivemq.com"
+#define MQTT_PORT 1883
+#define MQTT_TOPIC_HIT "target/hit"
+#define MQTT_TOPIC_RESET "target/reset"
 
 // --- Configuración de Hardware ---
 #define LED_PIN 3
-#define MAX_LEDS 100
+#define MAX_LEDS 30
 #define IR_RECEIVE_PIN 4
 
 // --- Códigos IR (Control 24 botones NEC) ---

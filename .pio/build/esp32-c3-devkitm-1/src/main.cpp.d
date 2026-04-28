@@ -159,6 +159,7 @@
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_hw_support/include/soc/esp32/spiram.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/io_pin_remap.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src/ArduinoOTA.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFi.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Print.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/IPv6Address.h \
@@ -179,75 +180,11 @@
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiUdp.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Udp.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/cbuf.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src/HTTPClient.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiClient.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src/WiFiClientSecure.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src/ssl_client.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/mbedtls/esp_config.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/config.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/check_config.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/esp_mem.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform_time.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/net.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/net_sockets.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ssl.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/mbedtls/bignum.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/bignum.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecp.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/pk.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/md.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform_util.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/rsa.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/cipher.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509_crt.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/asn1.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509_crl.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/dhm.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecdh.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/debug.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/sha512.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/aes.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/aes_alt.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/aes/esp_aes.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/hal/include/hal/aes_types.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/error.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRremote.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRVersion.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRProtocol.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/digitalWriteFast.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRremoteInt.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/private/IRTimer.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRFeedbackLED.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LongUnion.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRProtocol.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRReceive.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LocalDebugLevelStart.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LocalDebugLevelEnd.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRSend.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_BangOlufsen.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_BoseWave.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Denon.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_JVC.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Kaseikyo.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Lego.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_LG.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_MagiQuest.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_NEC.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_OpenLASIR.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_RC5_RC6.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Samsung.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Sony.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_FAST.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/TinyIR.h \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Others.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Pronto.hpp \
- .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_DistanceWidthProtocol.hpp \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/Update/src/Update.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/MD5Builder.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_rom/include/esp_rom_md5.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src/ESPmDNS.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mdns/include/mdns.h \
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/FastLED.h \
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/fl/stdint.h \
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/fl/dll.h \
@@ -398,6 +335,81 @@
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/platforms/ui_defs.h \
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/sensors/button.h \
  .pio/libdeps/esp32-c3-devkitm-1/FastLED/src/sensors/digital_pin.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src/HTTPClient.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiClient.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src/WiFiClientSecure.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src/ssl_client.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/mbedtls/esp_config.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/config.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/check_config.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/esp_mem.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform_time.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/net.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/net_sockets.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ssl.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/mbedtls/bignum.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/bignum.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecp.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/pk.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/md.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/platform_util.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/rsa.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/cipher.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509_crt.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/asn1.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/x509_crl.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/dhm.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ecdh.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/debug.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/sha512.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/aes.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/aes_alt.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/port/include/aes/esp_aes.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/hal/include/hal/aes_types.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mbedtls/mbedtls/include/mbedtls/error.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRremote.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRVersion.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRProtocol.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/digitalWriteFast.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRremoteInt.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/private/IRTimer.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRFeedbackLED.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LongUnion.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRProtocol.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRReceive.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LocalDebugLevelStart.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/LocalDebugLevelEnd.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/IRSend.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_BangOlufsen.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_BoseWave.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Denon.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_JVC.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Kaseikyo.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Lego.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_LG.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_MagiQuest.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_NEC.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_OpenLASIR.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_RC5_RC6.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Samsung.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Sony.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_FAST.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/TinyIR.h \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Others.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_Pronto.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/IRremote/src/ir_DistanceWidthProtocol.hpp \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src/Preferences.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/WebServer.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/HTTP_Method.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/nghttp/port/include/http_parser.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/Uri.h \
+ /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/detail/RequestHandler.h \
  .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/WiFiManager.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_wifi/include/esp_wifi.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_wifi/include/esp_wifi_types.h \
@@ -405,20 +417,7 @@
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_wifi/include/esp_wifi_crypto_types.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_wifi/include/esp_private/wifi_os_adapter.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_wifi/include/esp_wifi_default.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/Update/src/Update.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/cores/esp32/MD5Builder.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/esp_rom/include/esp_rom_md5.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/WebServer.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/HTTP_Method.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/nghttp/port/include/http_parser.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/Uri.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src/detail/RequestHandler.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/DNSServer/src/DNSServer.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiUdp.h \
  .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_strings_en.h \
- .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_consts_en.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/Preferences/src/Preferences.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/ArduinoOTA/src/ArduinoOTA.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src/ESPmDNS.h \
- /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/include/mdns/include/mdns.h \
- src/config.h
+ .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_consts_en.h src/config.h
