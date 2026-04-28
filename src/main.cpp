@@ -21,7 +21,7 @@ char current_mqtt_topic_hit[50];
 char current_mqtt_topic_reset[50];
 int current_num_leds = 5;
 
-String global_last_ir = "Esperando impacto...";
+String global_last_ir = "Esperando...";
 bool isHit = false;
 WebServer *global_server = nullptr;
 WiFiManager wm;
@@ -32,38 +32,70 @@ unsigned long lastMqttRetry = 0;
 
 // --- Prototipos ---
 void animationReset();
+void reportAction(int playerID, bool isReset);
+
+// --- CSS Premium ---
+String getStyle() {
+  String s = "<style>";
+  s += "body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#0f0f12; color:#e0e0e0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; min-height:100vh;}";
+  s += ".container{width:100%; max-width:440px; background:rgba(255,255,255,0.03); backdrop-filter:blur(10px); border-radius:30px; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); box-sizing:border-box;}";
+  s += "h1{font-size:28px; font-weight:800; margin-bottom:25px; background:linear-gradient(90deg, #00f2fe 0%, #4facfe 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center;}";
+  s += ".card{background:rgba(255,255,255,0.05); border-radius:20px; padding:20px; margin-bottom:20px; border-left:4px solid #00f2fe;}";
+  s += ".label{font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:#888; margin-bottom:8px;}";
+  s += ".value{font-size:20px; font-weight:600; color:#fff;}";
+  s += ".btn{display:block; width:100%; padding:18px; border-radius:18px; border:none; font-size:16px; font-weight:700; cursor:pointer; transition:all 0.3s ease; text-transform:uppercase; letter-spacing:1px; margin-top:20px; text-align:center; text-decoration:none;}";
+  s += ".btn-primary{background:linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color:#000; box-shadow:0 10px 20px rgba(0,242,254,0.3);}";
+  s += ".btn-primary:active{transform:scale(0.98); opacity:0.9;}";
+  s += ".btn-outline{background:transparent; border:1px solid #444; color:#aaa; font-size:14px; margin-top:15px;}";
+  s += "form{width:100%;} input{width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid #333; border-radius:12px; padding:12px; color:#fff; margin-bottom:15px; font-size:15px;}";
+  s += "input:focus{outline:none; border-color:#00f2fe;}";
+  s += ".section-title{font-size:14px; font-weight:700; color:#00f2fe; margin:25px 0 15px 0; border-bottom:1px solid #333; padding-bottom:5px;}";
+  s += ".status-dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px;}";
+  s += ".status-online{background:#00e676; box-shadow:0 0 10px #00e676;}";
+  s += ".status-offline{background:#ff5252;}";
+  s += "</style>";
+  return s;
+}
+
+String getHeader(String title) {
+  String h = "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>";
+  h += "<title>" + title + " | BuzzLY</title>";
+  h += getStyle();
+  h += "</head><body><div class='container'>";
+  return h;
+}
 
 // --- Callback MQTT ---
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  String message = "";
-  for (int i = 0; i < length; i++) message += (char)payload[i];
-  
   if (String(topic) == current_mqtt_topic_reset) {
     animationReset();
-    global_last_ir = "Reset por MQTT";
+    global_last_ir = "MQTT Reset";
   }
 }
 
-// --- Funciones de Comunicación ---
+// --- Comunicación ---
 void reportAction(int playerID, bool isReset) {
-  // 1. MQTT (Más rápido)
+  String targetName = String(current_mdns_name);
   if (mqttClient.connected()) {
     String msg;
     if (isReset) {
-      msg = "{\"action\":\"reset\"}";
-      mqttClient.publish(current_mqtt_topic_reset, msg.c_str());
+      msg = "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}";
     } else {
-      msg = "{\"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
-      mqttClient.publish(current_mqtt_topic_hit, msg.c_str());
+      msg = "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
     }
+    mqttClient.publish(isReset ? current_mqtt_topic_reset : current_mqtt_topic_hit, msg.c_str());
   }
 
-  // 2. HTTP POST (Legacy/Backup)
   if (WiFi.status() == WL_CONNECTED && strlen(current_api_url) > 5) {
     HTTPClient http;
     http.begin(current_api_url);
     http.addHeader("Content-Type", "application/json");
-    String json = isReset ? "{\"action\":\"reset\"}" : "{\"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
+    String json;
+    if (isReset) {
+      json = "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}";
+    } else {
+      json = "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
+    }
     http.POST(json);
     http.end();
   }
@@ -88,52 +120,57 @@ void animationHit(CRGB pColor) {
 void animationReset() {
   for (int i = 0; i < 3; i++) {
     fill_solid(leds, current_num_leds, CRGB::Blue);
-    FastLED.show();
-    delay(80);
+    FastLED.show(); delay(80);
     fill_solid(leds, current_num_leds, CRGB::Black);
-    FastLED.show();
-    delay(80);
+    FastLED.show(); delay(80);
   }
   isHit = false;
 }
 
-// --- Pantallas Web ---
+// --- Web Handlers ---
 void handleRoot() {
-  String html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'>";
-  html += "<style>body{font-family:sans-serif; background:#121212; color:white; text-align:center; padding:20px;}";
-  html += ".card{background:#1e1e1e; border-radius:15px; padding:20px; margin:10px auto; max-width:400px; border:1px solid #333;}";
-  html += "h1{color:#00e676;} .val{font-size:1.5em; color:#ffeb3b; font-weight:bold;}";
-  html += ".btn{background:#2196F3; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.1em; cursor:pointer; margin-top:20px; width:100%; display:inline-block; text-decoration:none;}";
-  html += ".cfg-link{color:#444; text-decoration:none; display:block; margin-top:30px;}</style>";
-  html += "<script>setInterval(function(){ location.reload(); }, 2000);</script></head><body>";
-  html += "<h1>BuzzLY Pro v2 (MQTT)</h1>";
-  html += "<div class='card'><h3>Último Impacto</h3><div class='val'>" + global_last_ir + "</div></div>";
-  html += "<div class='card'><h3>MQTT Status</h3><div class='val'>" + String(mqttClient.connected() ? "Conectado" : "Desconectado") + "</div></div>";
-  html += "<div style='max-width:400px; margin:auto;'>";
-  html += "<form action='/reset' method='POST'><button class='btn' type='submit'>RESET A VERDE</button></form>";
-  html += "<a href='/settings' class='cfg-link'>🔧 Ajustes Avanzados</a>";
-  html += "</div></body></html>";
+  String html = getHeader("Monitor");
+  html += "<h1>BuzzLY Pro</h1>";
+  
+  html += "<div class='card'><div class='label'>Status Sistema</div>";
+  html += "<div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
+
+  html += "<div class='card'><div class='label'>Ultimo Impacto</div>";
+  html += "<div class='value' id='last_ir'>" + global_last_ir + "</div></div>";
+
+  html += "<div class='card'><div class='label'>MQTT Link</div>";
+  String mqttStatus = mqttClient.connected() ? "status-online" : "status-offline";
+  String mqttText = mqttClient.connected() ? "Conectado" : "Desconectado";
+  html += "<div class='value'><span class='status-dot " + mqttStatus + "'></span>" + mqttText + "</div></div>";
+
+  html += "<form action='/reset' method='POST'><button class='btn btn-primary' type='submit'>Reset Blanco</button></form>";
+  html += "<a href='/settings' class='btn btn-outline'>Configuracion Avanzada</a>";
+  
+  html += "</div><script>setInterval(function(){fetch('/').then(r=>r.text()).then(h=>{document.body.innerHTML=new DOMParser().parseFromString(h,'text/html').body.innerHTML;});},3000);</script></body></html>";
   global_server->send(200, "text/html", html);
 }
 
 void handleSettings() {
-  String html = "<html><body style='background:#121212; color:white; font-family:sans-serif; text-align:center; padding:20px;'>";
-  html += "<h1>Configuración</h1><div style='background:#1e1e1e; padding:30px; border-radius:15px; display:inline-block; text-align:left;'>";
+  String html = getHeader("Ajustes");
+  html += "<h1>Setup</h1>";
   html += "<form action='/save' method='POST'>";
-  html += "<b>🌍 General</b><br>";
-  html += "mDNS Name:<br><input type='text' name='mdns_name' value='" + String(current_mdns_name) + "' style='width:300px; padding:8px; margin:5px 0;'><br>";
-  html += "LEDs:<br><input type='number' name='num_leds' value='" + String(current_num_leds) + "' style='width:300px; padding:8px; margin:5px 0;'><br><br>";
   
-  html += "<b>📡 MQTT Config</b><br>";
-  html += "Broker:<br><input type='text' name='mqtt_broker' value='" + String(current_mqtt_broker) + "' style='width:300px; padding:8px; margin:5px 0;'><br>";
-  html += "Topic Hit:<br><input type='text' name='topic_hit' value='" + String(current_mqtt_topic_hit) + "' style='width:300px; padding:8px; margin:5px 0;'><br>";
-  html += "Topic Reset:<br><input type='text' name='topic_reset' value='" + String(current_mqtt_topic_reset) + "' style='width:300px; padding:8px; margin:5px 0;'><br><br>";
+  html += "<div class='section-title'>PARAMETROS DE HARDWARE</div>";
+  html += "<div class='label'>Nombre mDNS</div><input type='text' name='mdns_name' value='" + String(current_mdns_name) + "'>";
+  html += "<div class='label'>Cantidad de LEDs</div><input type='number' name='num_leds' value='" + String(current_num_leds) + "'>";
 
-  html += "<b>🔗 API Legacy (HTTP)</b><br>";
-  html += "URL:<br><input type='text' name='api_url' value='" + String(current_api_url) + "' style='width:300px; padding:8px; margin:5px 0;'><br><br>";
-  
-  html += "<input type='submit' value='GUARDAR Y REINICIAR' style='width:100%; padding:15px; background:#00e676; border:none; border-radius:5px; font-weight:bold; cursor:pointer;'>";
-  html += "</form></div></body></html>";
+  html += "<div class='section-title'>COMMUNICATION (MQTT)</div>";
+  html += "<div class='label'>Broker Server</div><input type='text' name='mqtt_broker' value='" + String(current_mqtt_broker) + "'>";
+  html += "<div class='label'>Topic Hit</div><input type='text' name='topic_hit' value='" + String(current_mqtt_topic_hit) + "'>";
+  html += "<div class='label'>Topic Reset</div><input type='text' name='topic_reset' value='" + String(current_mqtt_topic_reset) + "'>";
+
+  html += "<div class='section-title'>LEGACY API (HTTP)</div>";
+  html += "<div class='label'>Endpoint URL</div><input type='text' name='api_url' value='" + String(current_api_url) + "'>";
+
+  html += "<button class='btn btn-primary' type='submit'>Aplicar y Reiniciar</button>";
+  html += "</form>";
+  html += "<a href='/' class='btn btn-outline'>Volver al Monitor</a>";
+  html += "</div></body></html>";
   global_server->send(200, "text/html", html);
 }
 
@@ -147,9 +184,17 @@ void handleSave() {
   if (global_server->hasArg("topic_hit")) prefs.putString("topic_hit", global_server->arg("topic_hit"));
   if (global_server->hasArg("topic_reset")) prefs.putString("topic_reset", global_server->arg("topic_reset"));
   prefs.end();
-  global_server->send(200, "text/plain", "Reiniciando con MQTT...");
+  global_server->send(200, "text/plain", "OK. Rebooting...");
   delay(1000);
   ESP.restart();
+}
+
+void handleResetWeb() {
+  animationReset();
+  reportAction(0, true);
+  global_last_ir = "Web Reset";
+  global_server->sendHeader("Location", "/");
+  global_server->send(303);
 }
 
 void reconnectMQTT() {
@@ -158,40 +203,29 @@ void reconnectMQTT() {
     String clientId = "BuzzLY-" + String(random(0xffff), HEX);
     if (mqttClient.connect(clientId.c_str())) {
       mqttClient.subscribe(current_mqtt_topic_reset);
-      Serial.println("MQTT Conectado.");
     }
   }
 }
 
 void startNetworkServices() {
   if (services_started) return;
-
   global_server = new WebServer(80);
   global_server->on("/", handleRoot);
   global_server->on("/settings", handleSettings);
   global_server->on("/save", HTTP_POST, handleSave);
-  global_server->on("/reset", HTTP_POST, [](){
-    animationReset();
-    reportAction(0, true);
-    global_server->sendHeader("Location", "/");
-    global_server->send(303);
-  });
+  global_server->on("/reset", HTTP_POST, handleResetWeb);
   global_server->begin();
-
   MDNS.begin(current_mdns_name);
   ArduinoOTA.setHostname(current_mdns_name);
   ArduinoOTA.setPassword("Buzz987");
   ArduinoOTA.begin();
-
-  mqttClient.setServer(current_mqtt_broker, MQTT_PORT);
+  mqttClient.setServer(current_mqtt_broker, 1883);
   mqttClient.setCallback(mqttCallback);
-
   services_started = true;
 }
 
 void setup() {
   delay(1000);
-
   Preferences prefs;
   prefs.begin("buzzly", true);
   current_num_leds = prefs.getInt("num_leds", 5);
@@ -206,32 +240,25 @@ void setup() {
   FastLED.setBrightness(100);
   fill_solid(leds, current_num_leds, CRGB::Black);
   FastLED.show();
-
   IrReceiver.begin(IR_RECEIVE_PIN);
-
   wm.setConfigPortalBlocking(false);
   wm.autoConnect("BuzzLY-Setup");
 }
 
 void loop() {
   wm.process();
-
   if (WiFi.status() == WL_CONNECTED) {
     startNetworkServices();
     ArduinoOTA.handle();
     if (global_server) global_server->handleClient();
-    
-    if (!mqttClient.connected()) {
-      reconnectMQTT();
-    } else {
-      mqttClient.loop();
-    }
+    if (!mqttClient.connected()) reconnectMQTT();
+    else mqttClient.loop();
   }
 
   if (IrReceiver.decode()) {
     uint32_t code = IrReceiver.decodedIRData.decodedRawData;
     if (code == CODE_RESET) {
-      global_last_ir = "Reset por Control";
+      global_last_ir = "IR Reset";
       animationReset();
       reportAction(0, true);
     } else if (!isHit) {
@@ -254,6 +281,5 @@ void loop() {
     FastLED.setBrightness(br);
     FastLED.show();
   }
-
   delay(5);
 }
