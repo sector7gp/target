@@ -105,7 +105,7 @@ void animationHit(CRGB pColor) {
 
 void animationReset() {
   for (int i = 0; i < 3; i++) {
-    fill_solid(leds, current_num_leds, CRGB::Blue);
+    fill_solid(leds, current_num_leds, CRGB::Purple);
     FastLED.show(); delay(80);
     fill_solid(leds, current_num_leds, CRGB::Black);
     FastLED.show(); delay(80);

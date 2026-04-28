@@ -20,7 +20,7 @@
 #define CODE_PLAYER1 0xE51AFF00 // Rojo
 #define CODE_PLAYER2 0x659AFF00 // Verde
 #define CODE_PLAYER3 0x5DA2FF00 // Azul
-#define CODE_PLAYER4 0x1DE2FF00 // Amarillo
+#define CODE_PLAYER4 0x1DE2FF00 // Amarillo (Botón naranja en control)
 #define CODE_PLAYER5 0xB748FF00 // Magenta
 #define CODE_PLAYER6 0x758AFF00 // Cyan
 #define CODE_RESET 0xBF40FF00   // Botón OFF
@@ -35,8 +35,8 @@ struct Player {
 const Player players[] = {{CODE_PLAYER1, CRGB::Red, "Jugador 1"},
                           {CODE_PLAYER2, CRGB::Green, "Jugador 2"},
                           {CODE_PLAYER3, CRGB::Blue, "Jugador 3"},
-                          {CODE_PLAYER4, CRGB::Yellow, "Jugador 4"},
+                          {CODE_PLAYER4, CRGB::Orange, "Jugador 4"},
                           {CODE_PLAYER5, CRGB::Magenta, "Jugador 5"},
-                          {CODE_PLAYER6, CRGB::Orange, "Jugador 6"}};
+                          {CODE_PLAYER6, CRGB::Cyan, "Jugador 6"}};
 
 #endif
