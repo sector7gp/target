@@ -17,8 +17,9 @@ char current_api_url[100];
 char current_mdns_name[30];
 String global_last_ir = "Esperando impacto...";
 bool isHit = false;
-unsigned long hitTime = 0;
 WebServer* global_server = nullptr;
+WiFiManager wm;
+bool services_started = false;
 
 // --- Funciones de API ---
 void sendHitToAPI(int playerID) {
@@ -45,25 +46,32 @@ void sendResetToAPI() {
 
 // --- Animaciones ---
 void animationHit(CRGB pColor) {
-    FastLED.setBrightness(255);
+    for (int i = 0; i < 15; i++) {
+        fill_solid(leds, NUM_LEDS, pColor);
+        for (int j = 0; j < 3; j++) {
+            int pixel = random(0, NUM_LEDS);
+            leds[pixel] = (random(0, 2) == 0) ? CRGB::White : CRGB::Yellow;
+        }
+        FastLED.setBrightness(255);
+        FastLED.show();
+        delay(30);
+    }
     fill_solid(leds, NUM_LEDS, pColor);
     FastLED.show();
 }
 
 void animationReset() {
-    // Parpadeo azul rápido para indicar que se recibió el comando
     for(int i=0; i<3; i++) {
         fill_solid(leds, NUM_LEDS, CRGB::Blue);
         FastLED.show(); delay(80);
         fill_solid(leds, NUM_LEDS, CRGB::Black);
         FastLED.show(); delay(80);
     }
-    isHit = false; // Forzamos la vuelta al Glow Verde inmediatamente
+    isHit = false;
 }
 
 // --- Pantallas Web ---
 void handleRoot() {
-    if (!global_server) return;
     String html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'>";
     html += "<style>body{font-family:sans-serif; background:#121212; color:white; text-align:center; padding:20px;}";
     html += ".card{background:#1e1e1e; border-radius:15px; padding:20px; margin:10px auto; max-width:400px; border:1px solid #333;}";
@@ -73,7 +81,7 @@ void handleRoot() {
     html += "<script>setInterval(function(){ location.reload(); }, 2000);</script></head><body>";
     html += "<h1>BuzzLY Pro Monitor</h1>";
     html += "<div class='card'><h3>Último Jugador</h3><div class='val'>" + global_last_ir + "</div></div>";
-    html += "<div class='card'><h3>Potencia WiFi</h3><div class='val'>" + String(WiFi.RSSI()) + " dBm</div></div>";
+    html += "<div class='card'><h3>Potencia WiFi</h3><div class='val'>" + String(WiFi.status() == WL_CONNECTED ? String(WiFi.RSSI()) + " dBm" : "Desconectado") + "</div></div>";
     html += "<div style='max-width:400px; margin:auto;'>";
     html += "<form action='/reset' method='POST'><button class='btn' type='submit'>RESET A VERDE</button></form>";
     html += "<a href='/settings' class='cfg-link'>🔧 Ajustes</a>";
@@ -88,7 +96,7 @@ void handleSettings() {
     html += "API URL:<br><input type='text' name='api_url' value='" + String(current_api_url) + "' style='width:300px; padding:10px; margin:10px 0; background:#222; border:1px solid #444; color:white;'><br>";
     html += "Nombre de Red (mDNS):<br><input type='text' name='mdns_name' value='" + String(current_mdns_name) + "' style='width:300px; padding:10px; margin:10px 0; background:#222; border:1px solid #444; color:white;'><br>";
     html += "<input type='submit' value='GUARDAR Y REINICIAR' style='width:100%; padding:15px; background:#00e676; border:none; border-radius:5px; font-weight:bold; cursor:pointer;'>";
-    html += "</form></div><br><a href='/' style='color:#2196F3; display:block; margin-top:20px;'>← Cancelar</a></body></html>";
+    html += "</form></div></body></html>";
     global_server->send(200, "text/html", html);
 }
 
@@ -111,17 +119,39 @@ void handleResetWeb() {
     global_server->send(303);
 }
 
+void startNetworkServices() {
+    if (services_started) return;
+    
+    global_server = new WebServer(80);
+    global_server->on("/", handleRoot);
+    global_server->on("/settings", handleSettings);
+    global_server->on("/save", HTTP_POST, handleSave);
+    global_server->on("/reset", HTTP_POST, handleResetWeb);
+    global_server->begin();
+
+    MDNS.begin(current_mdns_name);
+    ArduinoOTA.setHostname(current_mdns_name);
+    ArduinoOTA.setPassword("Buzz987");
+    ArduinoOTA.begin();
+    MDNS.addService("http", "tcp", 80);
+    
+    services_started = true;
+    Serial.println("Servicios de red iniciados.");
+}
+
 void setup() {
     delay(1000);
     Serial.begin(115200);
+    
+    // Iniciar Periféricos Críticos INMEDIATAMENTE
     FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setBrightness(100);
     fill_solid(leds, NUM_LEDS, CRGB::Black);
     FastLED.show();
+    
+    IrReceiver.begin(IR_RECEIVE_PIN);
 
-    WiFiManager wm;
-    if (!wm.autoConnect("BuzzLY-Setup")) { delay(1000); ESP.restart(); }
-
+    // Cargar Configuración de Memoria
     Preferences prefs;
     prefs.begin("buzzly", true);
     String url = prefs.getString("api_url", API_ENDPOINT);
@@ -130,32 +160,32 @@ void setup() {
     mname.toCharArray(current_mdns_name, 30);
     prefs.end();
 
-    global_server = new WebServer(80);
-    global_server->on("/", handleRoot);
-    global_server->on("/settings", handleSettings);
-    global_server->on("/save", HTTP_POST, handleSave);
-    global_server->on("/reset", HTTP_POST, handleResetWeb);
-    global_server->begin();
-
-    IrReceiver.begin(IR_RECEIVE_PIN);
-    MDNS.begin(current_mdns_name);
-    ArduinoOTA.setHostname(current_mdns_name);
-    ArduinoOTA.setPassword("Buzz987");
-    ArduinoOTA.begin();
-    MDNS.addService("http", "tcp", 80);
+    // Configurar WiFi de forma NO BLOQUEANTE
+    wm.setConfigPortalBlocking(false);
+    wm.autoConnect("BuzzLY-Setup");
+    
+    Serial.println("Setup completado. Iniciando loop paralelo...");
 }
 
 void loop() {
-    ArduinoOTA.handle();
-    if (global_server) global_server->handleClient();
+    // 1. Gestión de WiFi en segundo plano
+    wm.process();
+    
+    // 2. Si hay WiFi y los servicios no iniciaron, iniciarlos
+    if (WiFi.status() == WL_CONNECTED) {
+        startNetworkServices();
+        ArduinoOTA.handle();
+        if (global_server) global_server->handleClient();
+    }
 
+    // 3. Lógica del Juego (Corre siempre, con o sin WiFi)
     if (IrReceiver.decode()) {
         uint32_t code = IrReceiver.decodedIRData.decodedRawData;
         bool isMatch = false;
 
         if (code == CODE_RESET) {
             global_last_ir = "Reset por Control";
-            animationReset(); // Esto ya pone isHit = false
+            animationReset();
             sendResetToAPI();
             isMatch = true;
         } else if (!isHit) {
@@ -164,7 +194,6 @@ void loop() {
                     global_last_ir = players[i].name;
                     animationHit(players[i].color);
                     isHit = true;
-                    // El target queda bloqueado (isHit) infinitamente hasta el reset.
                     sendHitToAPI(i + 1);
                     isMatch = true;
                     break;
@@ -180,5 +209,6 @@ void loop() {
         FastLED.setBrightness(br);
         FastLED.show();
     }
+    
     delay(5);
 }
