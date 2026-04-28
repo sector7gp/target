@@ -14,7 +14,6 @@
 
 // --- Globales ---
 CRGB leds[MAX_LEDS];
-char current_api_url[100];
 char current_mdns_name[30];
 char current_mqtt_broker[50];
 char current_mqtt_topic_hit[50];
@@ -78,8 +77,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
 // --- Comunicación ---
 void reportAction(int playerID, bool isReset) {
-  String targetName = String(current_mdns_name);
   if (mqttClient.connected()) {
+    String targetName = String(current_mdns_name);
     String msg;
     if (isReset) {
       msg = "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}";
@@ -87,20 +86,6 @@ void reportAction(int playerID, bool isReset) {
       msg = "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
     }
     mqttClient.publish(isReset ? current_mqtt_topic_reset : current_mqtt_topic_hit, msg.c_str());
-  }
-
-  if (WiFi.status() == WL_CONNECTED && strlen(current_api_url) > 5) {
-    HTTPClient http;
-    http.begin(current_api_url);
-    http.addHeader("Content-Type", "application/json");
-    String json;
-    if (isReset) {
-      json = "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}";
-    } else {
-      json = "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
-    }
-    http.POST(json);
-    http.end();
   }
 }
 
@@ -134,21 +119,14 @@ void animationReset() {
 void handleRoot() {
   String html = getHeader("Monitor");
   html += "<h1>BuzzLY Pro</h1>";
-  
-  html += "<div class='card'><div class='label'>Status Sistema</div>";
-  html += "<div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
-
-  html += "<div class='card'><div class='label'>Ultimo Impacto</div>";
-  html += "<div class='value' id='last_ir'>" + global_last_ir + "</div></div>";
-
+  html += "<div class='card'><div class='label'>Status Sistema</div><div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
+  html += "<div class='card'><div class='label'>Ultimo Impacto</div><div class='value' id='last_ir'>" + global_last_ir + "</div></div>";
   html += "<div class='card'><div class='label'>MQTT Link</div>";
   String mqttStatus = mqttClient.connected() ? "status-online" : "status-offline";
   String mqttText = mqttClient.connected() ? "Conectado" : "Desconectado";
   html += "<div class='value'><span class='status-dot " + mqttStatus + "'></span>" + mqttText + "</div></div>";
-
   html += "<form action='/reset' method='POST'><button class='btn btn-primary' type='submit'>Reset Blanco</button></form>";
   html += "<a href='/settings' class='btn btn-outline'>Configuracion Avanzada</a>";
-  
   html += "</div><script>setInterval(function(){fetch('/').then(r=>r.text()).then(h=>{document.body.innerHTML=new DOMParser().parseFromString(h,'text/html').body.innerHTML;});},3000);</script></body></html>";
   global_server->send(200, "text/html", html);
 }
@@ -157,30 +135,21 @@ void handleSettings() {
   String html = getHeader("Ajustes");
   html += "<h1>Setup</h1>";
   html += "<form action='/save' method='POST'>";
-  
   html += "<div class='section-title'>PARAMETROS DE HARDWARE</div>";
   html += "<div class='label'>Nombre mDNS</div><input type='text' name='mdns_name' value='" + String(current_mdns_name) + "'>";
   html += "<div class='label'>Cantidad de LEDs</div><input type='number' name='num_leds' value='" + String(current_num_leds) + "'>";
-
   html += "<div class='section-title'>COMMUNICATION (MQTT)</div>";
   html += "<div class='label'>Broker Server</div><input type='text' name='mqtt_broker' value='" + String(current_mqtt_broker) + "'>";
   html += "<div class='label'>Topic Hit</div><input type='text' name='topic_hit' value='" + String(current_mqtt_topic_hit) + "'>";
   html += "<div class='label'>Topic Reset</div><input type='text' name='topic_reset' value='" + String(current_mqtt_topic_reset) + "'>";
-
-  html += "<div class='section-title'>LEGACY API (HTTP)</div>";
-  html += "<div class='label'>Endpoint URL</div><input type='text' name='api_url' value='" + String(current_api_url) + "'>";
-
   html += "<button class='btn btn-primary' type='submit'>Aplicar y Reiniciar</button>";
-  html += "</form>";
-  html += "<a href='/' class='btn btn-outline'>Volver al Monitor</a>";
-  html += "</div></body></html>";
+  html += "</form><a href='/' class='btn btn-outline'>Volver al Monitor</a></div></body></html>";
   global_server->send(200, "text/html", html);
 }
 
 void handleSave() {
   Preferences prefs;
   prefs.begin("buzzly", false);
-  if (global_server->hasArg("api_url")) prefs.putString("api_url", global_server->arg("api_url"));
   if (global_server->hasArg("mdns_name")) prefs.putString("mdns_name", global_server->arg("mdns_name"));
   if (global_server->hasArg("num_leds")) prefs.putInt("num_leds", global_server->arg("num_leds").toInt());
   if (global_server->hasArg("mqtt_broker")) prefs.putString("mqtt_broker", global_server->arg("mqtt_broker"));
@@ -232,7 +201,6 @@ void setup() {
   Preferences prefs;
   prefs.begin("buzzly", true);
   current_num_leds = prefs.getInt("num_leds", 5);
-  prefs.getString("api_url", API_ENDPOINT).toCharArray(current_api_url, 100);
   prefs.getString("mdns_name", MDNS_HOSTNAME).toCharArray(current_mdns_name, 30);
   prefs.getString("mqtt_broker", MQTT_BROKER).toCharArray(current_mqtt_broker, 50);
   prefs.getString("topic_hit", MQTT_TOPIC_HIT).toCharArray(current_mqtt_topic_hit, 50);

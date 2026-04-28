@@ -5,7 +5,6 @@
 #include <FastLED.h>
 
 // --- Configuración de Red ---
-#define API_ENDPOINT "http://tuservidor.com/api/hit"
 #define MDNS_HOSTNAME "buzzly-target"
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
@@ -36,8 +35,8 @@ struct Player {
 const Player players[] = {{CODE_PLAYER1, CRGB::Red, "Jugador 1"},
                           {CODE_PLAYER2, CRGB::Green, "Jugador 2"},
                           {CODE_PLAYER3, CRGB::Blue, "Jugador 3"},
-                          {CODE_PLAYER4, CRGB::Orange, "Jugador 4"},
+                          {CODE_PLAYER4, CRGB::Yellow, "Jugador 4"},
                           {CODE_PLAYER5, CRGB::Magenta, "Jugador 5"},
-                          {CODE_PLAYER6, CRGB::Cyan, "Jugador 6"}};
+                          {CODE_PLAYER6, CRGB::Orange, "Jugador 6"}};
 
 #endif
