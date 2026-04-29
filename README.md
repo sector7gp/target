@@ -1,51 +1,37 @@
 # 🎯 BuzzLY Target Pro - Firmware Inteligente para ESP32-C3
 
-Este proyecto convierte un ESP32-C3 SuperMini en un blanco de tiro infrarrojo inteligente con monitoreo web, comunicación MQTT en tiempo real, actualizaciones inalámbricas (OTA) y una interfaz de usuario premium con estética **"Ultra-Buzz Neon Green"**.
+Este proyecto convierte un ESP32-C3 SuperMini en un blanco de tiro infrarrojo inteligente de nivel profesional con comunicación MQTT en tiempo real, monitoreo de señal y telemetría avanzada.
 
 ## 🛠️ Hardware y Conexiones
 
 | Componente | Pin del ESP32-C3 | Descripción |
 | :--- | :--- | :--- |
-| **LED Strip (WS2812B)** | **GPIO 3** | Entrada de datos (DIN). Configurable desde la web (hasta 30 LEDs). |
-| **Sensor IR Receiver** | **GPIO 4** | Pin de datos del receptor (tipo TSOP/VS1838). |
-| **Alimentación** | **5V / GND** | Se recomienda alimentar por el pin 5V (USB o externa). |
+| **LED Strip (WS2812B)** | **GPIO 3** | Entrada de datos (DIN). Configurable vía Web. |
+| **LED RGB (Ánodo Común)** | **G:1, R:2, B:0, A:5** | Alternativa física/compacta. |
+| **Sensor IR Receiver** | **GPIO 4** | Pin de datos del receptor (IRremote 4.x). |
 
-> [!IMPORTANT]
-> **Modo de Flash**: El ESP32-C3 SuperMini debe flashearse en modo **DIO**. Esto ya está configurado en el archivo `platformio.ini`.
+## 📡 Capacidades Pro (V3.1)
 
-## 📡 Conectividad y Comunicación (MQTT Pro)
+- **🚀 MQTT Telemetría**: Envío instantáneo de hits con ID de target único.
+  - **Topic Hit**: `target/hit` -> `{"target":"nombre", "player_id":X, "action":"hit"}`.
+  - **Topic Reset Seguro**: `target/reset`. Requiere el JSON `{"action":"reset"}` para validar el comando.
+- **📊 Monitoreo en Tiempo Real**: El portal web muestra la intensidad de señal WiFi (**RSSI**) en dBm para diagnóstico de campo.
+- **⚡ Performance No Bloqueante**: El sensor IR y los efectos visuales inician en milisegundos, operando en paralelo a la negociación de red.
 
-El sistema está optimizado para comunicación de alto rendimiento vía MQTT:
+## 🎮 Mapeo de Jugadores
 
-- **🚀 MQTT Inmediato**: Envía mensajes JSON al instante a un Broker configurable.
-  - **Hit Topic**: `target/hit` -> `{"target":"target1", "player_id":1, "action":"hit"}`
-  - **Reset Topic**: `target/reset` -> Escucha para reinicio remoto (JSON `{"action":"reset"}` o mensaje simple).
-- **Arranque Paralelo**: El sensor IR y los LEDs funcionan de inmediato al encender el target, mientras el WiFi se conecta en segundo plano sin bloquear el sistema.
+| Jugador | Color LED | Reset |
+| :--- | :--- | :--- |
+| **J1 a J6** | Rojo, Verde, Azul, Naranja, Magenta, Cian | **Violeta** 🟣 |
 
-## 🎮 Mapeo de Jugadores y Colores
+## ✨ Interfaz "Target Pro"
+- **Refresco Optimizado**: El monitor web se actualiza cada **15 segundos** para reducir el tráfico de red en despliegues masivos.
+- **Estética Buzz Neon**: UI moderna basada en Glassmorphism y tipografía optimizada.
 
-| Jugador | Botón (Control 24b) | Código RAW | Color LED |
-| :--- | :--- | :--- | :--- |
-| **J1** | **Rojo** | `0xE51AFF00` | Rojo 🔴 |
-| **J2** | **Verde** | `0x659AFF00` | Verde 🟢 |
-| **J3** | **Azul** | `0x5DA2FF00` | Azul 🔵 |
-| **J4** | **Naranja** | `0x1DE2FF00` | Naranja 🟠 |
-| **J5** | **Magenta** | `0xB748FF00` | Magenta 🟣 |
-| **J6** | **Cian** | `0x758AFF00` | Cian 🔵 |
-| **Reset** | **Off / Reset** | `0xBF40FF00` | **Violeta** 🟣 (Animación) |
-
-## ✨ Interfaz Web "Buzz Neon Green"
-
-Acceso vía mDNS en `http://nombre-configurado.local` (ej: `target1.local`).
-
-- **Monitor (`/`)**: Interfaz premium con **Glassmorphism**, indicadores de conexión MQTT y reporte del último impacto.
-- **Ajustes (`/settings`)**: Configuración dinámica de mDNS, cantidad de LEDs, Bróker y Tópicos MQTT sin reprogramar.
-
-## 🚀 Instalación y Mantenimiento
-
-1. Abrir con PlatformIO en VS Code.
-2. Flashear vía USB la primera vez: `pio run -t upload`.
-3. Actualizaciones futuras vía **OTA** inalámbrica (Contraseña: `Buzz987`).
+## 🚀 Instalación
+1. Flashear vía USB la primera vez (`pio run -t upload`).
+2. Configurar WiFi y MQTT en el portal cautivo o `/settings`.
+3. Actualizar vía **OTA** en el futuro (Pass: `Buzz987`).
 
 ---
 *Mando del Comando Estelar - BuzzLY Target System.*

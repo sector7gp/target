@@ -421,4 +421,8 @@
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/DNSServer/src/DNSServer.h \
  /Users/sector7gp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiUdp.h \
  .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_strings_en.h \
- .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_consts_en.h src/config.h
+ .pio/libdeps/esp32-c3-devkitm-1/WiFiManager/wm_consts_en.h \
+ .pio/libdeps/esp32-c3-devkitm-1/ArduinoJson/src/ArduinoJson.h \
+ .pio/libdeps/esp32-c3-devkitm-1/ArduinoJson/src/ArduinoJson.hpp \
+ .pio/libdeps/esp32-c3-devkitm-1/ArduinoJson/src/ArduinoJson/Configuration.hpp \
+ src/config.h
