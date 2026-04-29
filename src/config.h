@@ -17,10 +17,10 @@
 #define IR_RECEIVE_PIN 4
 
 // --- Configuración LED RGB (Ánodo Común) ---
-#define PIN_RGB_R 5
-#define PIN_RGB_A 6
-#define PIN_RGB_G 7
-#define PIN_RGB_B 8
+#define PIN_RGB_R 2
+#define PIN_RGB_G 1
+#define PIN_RGB_B 0
+#define PIN_RGB_A 5 // Ánodo Común (+)
 
 // --- Códigos IR (Control 24 botones NEC) ---
 #define CODE_PLAYER1 0xE51AFF00 // Rojo
