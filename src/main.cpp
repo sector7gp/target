@@ -29,9 +29,27 @@ PubSubClient mqttClient(espClient);
 bool services_started = false;
 unsigned long lastMqttRetry = 0;
 
+// --- PWM Channels for RGB LED ---
+const int chR = 0;
+const int chG = 1;
+const int chB = 2;
+
 // --- Prototipos ---
 void animationReset();
 void reportAction(int playerID, bool isReset);
+
+// --- Control LED RGB (Ánodo Común) ---
+void updateRGBLED(CRGB color, uint8_t brightness = 255) {
+  // Escalar el color por el brillo actual
+  uint8_t r = (color.r * brightness) / 255;
+  uint8_t g = (color.g * brightness) / 255;
+  uint8_t b = (color.b * brightness) / 255;
+
+  // Ánodo común: 255 es apagado, 0 es encendido máximo
+  ledcWrite(chR, 255 - r);
+  ledcWrite(chG, 255 - g);
+  ledcWrite(chB, 255 - b);
+}
 
 // --- CSS Premium ---
 String getStyle() {
@@ -77,12 +95,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 void reportAction(int playerID, bool isReset) {
   if (mqttClient.connected()) {
     String targetName = String(current_mdns_name);
-    String msg;
-    if (isReset) {
-      msg = "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}";
-    } else {
-      msg = "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
-    }
+    String msg = isReset ? "{\"target\":\"" + targetName + "\", \"action\":\"reset\"}" : "{\"target\":\"" + targetName + "\", \"player_id\":" + String(playerID) + ", \"action\":\"hit\"}";
     mqttClient.publish(isReset ? current_mqtt_topic_reset : current_mqtt_topic_hit, msg.c_str());
   }
 }
@@ -91,23 +104,29 @@ void reportAction(int playerID, bool isReset) {
 void animationHit(CRGB pColor) {
   for (int i = 0; i < 15; i++) {
     fill_solid(leds, current_num_leds, pColor);
+    CRGB sparkleColor = pColor;
     for (int j = 0; j < 3; j++) {
       int pixel = random(0, current_num_leds);
-      leds[pixel] = (random(0, 2) == 0) ? CRGB::White : CRGB::Yellow;
+      sparkleColor = (random(0, 2) == 0) ? CRGB::White : CRGB::Yellow;
+      leds[pixel] = sparkleColor;
     }
+    updateRGBLED(sparkleColor); // El LED RGB mostrará el color de la chispa
     FastLED.setBrightness(255);
     FastLED.show();
     delay(30);
   }
   fill_solid(leds, current_num_leds, pColor);
+  updateRGBLED(pColor);
   FastLED.show();
 }
 
 void animationReset() {
   for (int i = 0; i < 3; i++) {
     fill_solid(leds, current_num_leds, CRGB::Purple);
+    updateRGBLED(CRGB::Purple);
     FastLED.show(); delay(80);
     fill_solid(leds, current_num_leds, CRGB::Black);
+    updateRGBLED(CRGB::Black);
     FastLED.show(); delay(80);
   }
   isHit = false;
@@ -116,32 +135,29 @@ void animationReset() {
 // --- Web Handlers ---
 void handleRoot() {
   String html = getHeader("Monitor");
-  html += "<h1>BuzzLY Pro</h1>";
-  html += "<div class='card'><div class='label'>Status Sistema</div><div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
+  html += "<h1>BuzzLY Pro</h1><div class='card'><div class='label'>Status Sistema</div><div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
   html += "<div class='card'><div class='label'>Ultimo Impacto</div><div class='value' id='last_ir'>" + global_last_ir + "</div></div>";
   html += "<div class='card'><div class='label'>MQTT Link</div>";
   String mqttStatus = mqttClient.connected() ? "status-online" : "status-offline";
   String mqttText = mqttClient.connected() ? "Conectado" : "Desconectado";
   html += "<div class='value'><span class='status-dot " + mqttStatus + "'></span>" + mqttText + "</div></div>";
   html += "<form action='/reset' method='POST'><button class='btn btn-primary' type='submit'>Reset Blanco</button></form>";
-  html += "<a href='/settings' class='btn btn-outline'>Configuracion Avanzada</a>";
-  html += "</div><script>setInterval(function(){fetch('/').then(r=>r.text()).then(h=>{document.body.innerHTML=new DOMParser().parseFromString(h,'text/html').body.innerHTML;});},3000);</script></body></html>";
+  html += "<a href='/settings' class='btn btn-outline'>Configuracion Avanzada</a></div>";
+  html += "<script>setInterval(function(){location.reload();},4000);</script></body></html>";
   global_server->send(200, "text/html", html);
 }
 
 void handleSettings() {
   String html = getHeader("Ajustes");
-  html += "<h1>Setup</h1>";
-  html += "<form action='/save' method='POST'>";
-  html += "<div class='section-title'>PARAMETROS DE HARDWARE</div>";
+  html += "<h1>Setup</h1><form action='/save' method='POST'><div class='section-title'>PARAMETROS DE HARDWARE</div>";
   html += "<div class='label'>Nombre mDNS</div><input type='text' name='mdns_name' value='" + String(current_mdns_name) + "'>";
   html += "<div class='label'>Cantidad de LEDs</div><input type='number' name='num_leds' value='" + String(current_num_leds) + "'>";
   html += "<div class='section-title'>COMMUNICATION (MQTT)</div>";
   html += "<div class='label'>Broker Server</div><input type='text' name='mqtt_broker' value='" + String(current_mqtt_broker) + "'>";
   html += "<div class='label'>Topic Hit</div><input type='text' name='topic_hit' value='" + String(current_mqtt_topic_hit) + "'>";
   html += "<div class='label'>Topic Reset</div><input type='text' name='topic_reset' value='" + String(current_mqtt_topic_reset) + "'>";
-  html += "<button class='btn btn-primary' type='submit'>Aplicar y Reiniciar</button>";
-  html += "</form><a href='/' class='btn btn-outline'>Volver al Monitor</a></div></body></html>";
+  html += "<button class='btn btn-primary' type='submit'>Aplicar y Reiniciar</button></form>";
+  html += "<a href='/' class='btn btn-outline'>Volver al Monitor</a></div></body></html>";
   global_server->send(200, "text/html", html);
 }
 
@@ -171,9 +187,7 @@ void reconnectMQTT() {
   if (millis() - lastMqttRetry > 5000) {
     lastMqttRetry = millis();
     String clientId = "BuzzLY-" + String(random(0xffff), HEX);
-    if (mqttClient.connect(clientId.c_str())) {
-      mqttClient.subscribe(current_mqtt_topic_reset);
-    }
+    if (mqttClient.connect(clientId.c_str())) mqttClient.subscribe(current_mqtt_topic_reset);
   }
 }
 
@@ -205,9 +219,20 @@ void setup() {
   prefs.getString("topic_reset", MQTT_TOPIC_RESET).toCharArray(current_mqtt_topic_reset, 50);
   prefs.end();
 
+  // Configuración LED RGB PWM
+  ledcSetup(chR, 5000, 8);
+  ledcSetup(chG, 5000, 8);
+  ledcSetup(chB, 5000, 8);
+  ledcAttachPin(PIN_RGB_R, chR);
+  ledcAttachPin(PIN_RGB_G, chG);
+  ledcAttachPin(PIN_RGB_B, chB);
+  pinMode(PIN_RGB_A, OUTPUT);
+  digitalWrite(PIN_RGB_A, HIGH); // Activar Ánodo Común (+)
+
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, MAX_LEDS);
   FastLED.setBrightness(100);
   fill_solid(leds, current_num_leds, CRGB::Black);
+  updateRGBLED(CRGB::Black);
   FastLED.show();
   IrReceiver.begin(IR_RECEIVE_PIN);
   wm.setConfigPortalBlocking(false);
@@ -247,6 +272,7 @@ void loop() {
   if (!isHit) {
     uint8_t br = beatsin8(15, 30, 150);
     fill_solid(leds, current_num_leds, CRGB::Green);
+    updateRGBLED(CRGB::Green, br);
     FastLED.setBrightness(br);
     FastLED.show();
   }
