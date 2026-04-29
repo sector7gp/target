@@ -9,6 +9,7 @@
 #include <WebServer.h>
 #include <WiFi.h>
 #include <WiFiManager.h>
+#include <ArduinoJson.h>
 
 #include "config.h"
 
@@ -40,12 +41,9 @@ void reportAction(int playerID, bool isReset);
 
 // --- Control LED RGB (Ánodo Común) ---
 void updateRGBLED(CRGB color, uint8_t brightness = 255) {
-  // Escalar el color por el brillo actual
   uint8_t r = (color.r * brightness) / 255;
   uint8_t g = (color.g * brightness) / 255;
   uint8_t b = (color.b * brightness) / 255;
-
-  // Ánodo común: 255 es apagado, 0 es encendido máximo
   ledcWrite(chR, 255 - r);
   ledcWrite(chG, 255 - g);
   ledcWrite(chB, 255 - b);
@@ -57,17 +55,16 @@ String getStyle() {
   s += "body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#08080a; color:#f0f0f0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; min-height:100vh;}";
   s += ".container{width:100%; max-width:440px; background:rgba(255,255,255,0.02); backdrop-filter:blur(20px); border-radius:35px; padding:35px; box-shadow:0 30px 60px rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.1); box-sizing:border-box;}";
   s += "h1{font-size:34px; font-weight:900; margin-bottom:30px; background:linear-gradient(90deg, #bfff00 0%, #00ff00 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; letter-spacing:-1.5px;}";
-  s += ".card{background:rgba(255,255,255,0.05); border-radius:24px; padding:22px; margin-bottom:20px; border-left:6px solid #bfff00; box-shadow:5px 5px 15px rgba(0,0,0,0.3);}";
+  s += ".card{background:rgba(255,255,255,0.05); border-radius:24px; padding:22px; margin-bottom:20px; border-left:6px solid #bfff00; position:relative; overflow:hidden;}";
   s += ".label{font-size:10px; text-transform:uppercase; letter-spacing:3px; color:#777; margin-bottom:12px; font-weight:800;}";
   s += ".value{font-size:24px; font-weight:800; color:#fff;}";
   s += ".btn{display:block; width:100%; padding:22px; border-radius:22px; border:none; font-size:18px; font-weight:900; cursor:pointer; transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-transform:uppercase; letter-spacing:2px; margin-top:20px; text-align:center; text-decoration:none; box-sizing:border-box;}";
   s += ".btn-primary{background:linear-gradient(135deg, #bfff00 0%, #00ff00 100%); color:#000; box-shadow:0 15px 30px rgba(191,255,0,0.35);}";
   s += ".btn-primary:hover{transform:scale(1.02); box-shadow:0 20px 40px rgba(191,255,0,0.5);}";
   s += ".btn-outline{background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.1); color:#ccc; font-size:14px;}";
-  s += ".btn-outline:hover{background:rgba(255,255,255,0.15); color:#fff; border-color:#bfff00; transform:scale(1.01);}";
+  s += ".btn-outline:hover{background:rgba(255,255,255,0.15); color:#fff; border-color:#bfff00;}";
   s += "form{width:100%;} input{width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:2px solid #222; border-radius:18px; padding:18px; color:#fff; margin-bottom:20px; font-size:18px;}";
-  s += "input:focus{outline:none; border-color:#bfff00; background:rgba(0,0,0,0.7);}";
-  s += ".section-title{font-size:14px; font-weight:900; color:#bfff00; margin:40px 0 25px 0; border-bottom:2px solid #222; padding-bottom:10px; letter-spacing:1.5px;}";
+  s += ".section-title{font-size:14px; font-weight:900; color:#bfff00; margin:40px 0 25px 0; border-bottom:2px solid #222; padding-bottom:10px;}";
   s += ".status-dot{display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:12px; vertical-align:middle;}";
   s += ".status-online{background:#bfff00; box-shadow:0 0 20px #bfff00;}";
   s += ".status-offline{background:#ff2d00; box-shadow:0 0 20px #ff2d00;}";
@@ -86,8 +83,12 @@ String getHeader(String title) {
 // --- Callback MQTT ---
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   if (String(topic) == current_mqtt_topic_reset) {
-    animationReset();
-    global_last_ir = "MQTT Reset";
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, payload, length);
+    if (!error && doc["action"] == "reset") {
+      animationReset();
+      global_last_ir = "MQTT Reset";
+    }
   }
 }
 
@@ -110,7 +111,7 @@ void animationHit(CRGB pColor) {
       sparkleColor = (random(0, 2) == 0) ? CRGB::White : CRGB::Yellow;
       leds[pixel] = sparkleColor;
     }
-    updateRGBLED(sparkleColor); // El LED RGB mostrará el color de la chispa
+    updateRGBLED(sparkleColor);
     FastLED.setBrightness(255);
     FastLED.show();
     delay(30);
@@ -135,15 +136,19 @@ void animationReset() {
 // --- Web Handlers ---
 void handleRoot() {
   String html = getHeader("Monitor");
-  html += "<h1>BuzzLY Pro</h1><div class='card'><div class='label'>Status Sistema</div><div class='value'><span class='status-dot status-online'></span>Operativo</div></div>";
+  html += "<h1>BuzzLY Pro</h1>";
+  
+  html += "<div class='card'><div class='label'>Intensidad Señal</div><div class='value'>" + String(WiFi.RSSI()) + " dBm</div></div>";
   html += "<div class='card'><div class='label'>Ultimo Impacto</div><div class='value' id='last_ir'>" + global_last_ir + "</div></div>";
-  html += "<div class='card'><div class='label'>MQTT Link</div>";
+  
+  html += "<div class='card'><div class='label'>MQTT Status</div>";
   String mqttStatus = mqttClient.connected() ? "status-online" : "status-offline";
   String mqttText = mqttClient.connected() ? "Conectado" : "Desconectado";
   html += "<div class='value'><span class='status-dot " + mqttStatus + "'></span>" + mqttText + "</div></div>";
+
   html += "<form action='/reset' method='POST'><button class='btn btn-primary' type='submit'>Reset Blanco</button></form>";
   html += "<a href='/settings' class='btn btn-outline'>Configuracion Avanzada</a></div>";
-  html += "<script>setInterval(function(){location.reload();},4000);</script></body></html>";
+  html += "<script>setInterval(function(){location.reload();}, 15000);</script></body></html>";
   global_server->send(200, "text/html", html);
 }
 
@@ -219,7 +224,6 @@ void setup() {
   prefs.getString("topic_reset", MQTT_TOPIC_RESET).toCharArray(current_mqtt_topic_reset, 50);
   prefs.end();
 
-  // Configuración LED RGB PWM
   ledcSetup(chR, 5000, 8);
   ledcSetup(chG, 5000, 8);
   ledcSetup(chB, 5000, 8);
@@ -227,7 +231,7 @@ void setup() {
   ledcAttachPin(PIN_RGB_G, chG);
   ledcAttachPin(PIN_RGB_B, chB);
   pinMode(PIN_RGB_A, OUTPUT);
-  digitalWrite(PIN_RGB_A, HIGH); // Activar Ánodo Común (+)
+  digitalWrite(PIN_RGB_A, HIGH);
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, MAX_LEDS);
   FastLED.setBrightness(100);
